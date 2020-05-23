@@ -4,9 +4,11 @@ import { Contact } from 'react-native-contacts';
 import moment from 'moment';
 import { getCanAccessContacts, requestAccessContacts, getContacts } from './services/contacts';
 
+const ThumbBGColors = ['#003f5c', '#58508d', '#bc5090', '#ff6361', '#ffa600'];
+
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 50,
+    paddingTop: 10,
     flex: 1,
   },
   title: {
@@ -34,15 +36,16 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 50,
     height: 50,
-    backgroundColor: '#ccc',
     borderRadius: 25,
     marginRight: 15,
   },
   name: {
-    fontSize: 16,
+    fontSize: 19,
+    color: '#202E39',
   },
   birthday: {
-    fontSize: 16,
+    fontSize: 17,
+    color: '#505E69',
   },
   separator: {
     backgroundColor: '#ccc',
@@ -54,6 +57,7 @@ const styles = StyleSheet.create({
 const AppContent = () => {
   const [canUseContacts, setCanUseContacts] = useState(false);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  let colorIndex = 0;
 
   useEffect((): void => {
     getCanAccessContacts()
@@ -78,11 +82,19 @@ const AppContent = () => {
         keyExtractor={(_, index) => `${index}`}
         renderItem={({ item: { birthday, givenName, thumbnailPath } }) => {
           const bdString = moment(birthday).format('MMM Do');
+          const backgroundColor = ThumbBGColors[colorIndex];
+          let ProfileImage: JSX.Element;
+          if (thumbnailPath !== '') {
+            ProfileImage = <Image source={{ uri: thumbnailPath }} style={styles.thumbnail} />;
+          } else {
+            colorIndex = (colorIndex + 1) % ThumbBGColors.length;
+            ProfileImage = <View style={[styles.thumbnail, { backgroundColor }]} />;
+          }
+
           return (
             <View style={styles.row}>
               <View style={styles.nameIconGroup}>
-                {thumbnailPath !== '' && <Image source={{ uri: thumbnailPath }} style={styles.thumbnail} />}
-                {thumbnailPath === '' && <View style={styles.thumbnail} />}
+                {ProfileImage}
                 <Text style={styles.name}>{givenName}</Text>
               </View>
               <View>
