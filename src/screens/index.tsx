@@ -1,16 +1,16 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import AppContent from './AppContent';
+import BirthdayList from './BirthdayList';
 
 enum Routes {
-  Home = 'Home',
+  BirthdayList = 'Birthday List',
 }
 
 const Stack = createStackNavigator();
 const StackNavigator = (): JSX.Element => {
   return (
-    <Stack.Navigator initialRouteName={Routes.Home}>
-      <Stack.Screen name={Routes.Home} component={AppContent} />
+    <Stack.Navigator initialRouteName={Routes.BirthdayList}>
+      <Stack.Screen name={Routes.BirthdayList} component={BirthdayList} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 };

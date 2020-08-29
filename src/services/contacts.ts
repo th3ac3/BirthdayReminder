@@ -1,13 +1,14 @@
-import { Platform, PermissionsAndroid, PermissionStatus, DrawerLayoutAndroid } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Platform, PermissionsAndroid, PermissionStatus } from 'react-native';
 import Contacts from 'react-native-contacts';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
-export const getCanAccessContacts = async (): Promise<boolean> => {
+export const canAccessContacts = async (): Promise<boolean> => {
   if (Platform.OS === 'ios') return true;
   return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
 };
 
-export const requestAccessContacts = async (): Promise<boolean> => {
+export const requestContactsAccess = async (): Promise<boolean> => {
   if (Platform.OS === 'ios') return true;
 
   const permission: PermissionStatus = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
@@ -19,31 +20,77 @@ export const requestAccessContacts = async (): Promise<boolean> => {
   return permission === 'granted';
 };
 
-export const getContacts = (): Promise<Contacts.Contact[]> => {
+export type Contact = {
+  name: string;
+  thumbnailPath?: string;
+  dateOfBirth: Moment;
+  nextBirthday: Moment;
+  age: number;
+};
+
+export const getContacts = (): Promise<Contact[]> => {
   return new Promise((resolve, reject) => {
-    Contacts.getAll((error, contacts) => {
+    Contacts.getAll((error, nonTransformedContacts) => {
       if (error) reject(error);
-      resolve(
-        contacts
-          .filter((contact) => contact.birthday !== undefined)
-          .map((contact) => ({ ...contact, birthday: { ...contact.birthday, month: contact.birthday.month - 1 } }))
-          .sort((a, b) => {
-            const now = moment();
-            const year = now.year();
-            let aDate = moment({ ...a.birthday, year });
-            let bDate = moment({ ...b.birthday, year });
+      const now = moment();
+      const currentYear = now.year();
 
-            // If BDay date was before right now then next BDay won't occur till next year
-            if (aDate.isBefore(now)) {
-              aDate.year(aDate.year() + 1);
-            }
-            if (bDate.isBefore(now)) {
-              bDate.year(bDate.year() + 1);
+      const contacts = nonTransformedContacts
+        .filter((contact) => contact.birthday !== undefined)
+        .map(
+          (contact): Contact => {
+            const dateOfBirth = moment({ ...contact.birthday });
+            const nextBirthday = moment(dateOfBirth).year(currentYear);
+            if (nextBirthday.isBefore(now)) {
+              nextBirthday.year(currentYear + 1);
             }
 
-            return aDate.valueOf() - bDate.valueOf();
-          }),
-      );
+            return {
+              name: `${contact.givenName} ${contact.familyName}`,
+              dateOfBirth,
+              nextBirthday,
+              thumbnailPath: contact.thumbnailPath || undefined,
+              age: now.diff(dateOfBirth, 'years'),
+            };
+          },
+        )
+        .sort((a, b) => {
+          return a.nextBirthday.valueOf() - b.nextBirthday.valueOf();
+        });
+
+      resolve(contacts);
     });
   });
+};
+
+export type UseContacts = {
+  canUseContacts: boolean;
+  contacts: Contact[];
+};
+
+export const useContacts = (): UseContacts => {
+  const [canUseContacts, setCanUseContacts] = useState(false);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+
+  useEffect((): void => {
+    const fetchContactInfo = async () => {
+      try {
+        let _canUseContacts = await canAccessContacts();
+        if (!_canUseContacts) _canUseContacts = await requestContactsAccess();
+        setCanUseContacts(_canUseContacts);
+
+        if (!_canUseContacts) return;
+        setContacts(await getContacts());
+      } catch (e) {
+        setCanUseContacts(false);
+      }
+    };
+
+    fetchContactInfo();
+  }, []);
+
+  return {
+    canUseContacts,
+    contacts,
+  };
 };
