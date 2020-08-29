@@ -4,6 +4,7 @@ import { AppColors, Fonts } from '../../styles';
 import { useContacts, Contact } from '../../services/contacts';
 import { useTranslation } from 'react-i18next';
 import { BirthdayListItem, BirthdaySeparator } from './BirthdayListItem';
+import { SearchBox } from '../../components';
 
 const styles = StyleSheet.create({
   container: {
@@ -40,6 +41,7 @@ const AppContent = () => {
       <Text style={styles.title}>{t('title')}</Text>
       <View style={styles.titleUnderline} />
       {!canUseContacts && <Text>{t('cantUseContacts')}</Text>}
+      <SearchBox />
       <FlatList
         style={styles.birthdayList}
         data={contacts}

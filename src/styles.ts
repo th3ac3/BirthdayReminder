@@ -1,7 +1,7 @@
 export enum AppColors {
   purple200 = '#0F0424',
   purple800 = '#9074AF',
-  pink600 = '#EB6098',
+  pink600 = '#DB7094',
   white = '#FFFFFF',
 }
 
