@@ -11,4 +11,7 @@ export default {
     timePeriod_weeks: 'Weeks',
     timePeriod_months: 'Months',
   },
+  Search: {
+    search: 'Search',
+  },
 };

@@ -2,7 +2,10 @@ import { FormatFunction } from 'i18next';
 import moment from 'moment';
 import numeral from 'numeral';
 
-const formatFunction: FormatFunction = (value: any, format?: string): string => {
+const formatFunction: FormatFunction = (
+  value: any,
+  format?: string,
+): string => {
   if (format === undefined) return value as string;
 
   if (typeof value === 'string') {

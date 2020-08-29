@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 import { AppColors, Fonts } from '../../styles';
 import { useContacts, Contact } from '../../services/contacts';
@@ -17,38 +17,48 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 23,
     color: AppColors.white,
+    marginBottom: 18,
   },
-  titleUnderline: {
-    backgroundColor: AppColors.pink600,
-    opacity: 0.85,
-    height: 3,
-    maxWidth: 80,
+  search: {
+    marginVertical: 8,
     marginHorizontal: 16,
-    marginTop: 5,
-    marginBottom: 28,
   },
-  birthdayList: {
+  itemContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.045)',
+    flex: 1,
   },
 });
 
 const AppContent = () => {
   const { t } = useTranslation('BirthdayList');
   const { canUseContacts, contacts } = useContacts();
+  const [filteredContacts, setFilteredContacts] = useState<Contact[]>(contacts);
+
+  useEffect(() => {
+    setFilteredContacts(contacts);
+  }, [contacts]);
+
+  const onSearchChange = (searchText: string) => {
+    setFilteredContacts(
+      contacts.filter((c) => c.name.search(searchText) !== -1),
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{t('title')}</Text>
-      <View style={styles.titleUnderline} />
       {!canUseContacts && <Text>{t('cantUseContacts')}</Text>}
-      <SearchBox />
-      <FlatList
-        style={styles.birthdayList}
-        data={contacts}
-        keyExtractor={(_, index) => `${index}`}
-        renderItem={({ item }: { item: Contact }) => <BirthdayListItem contact={item} />}
-        ItemSeparatorComponent={BirthdaySeparator}
-      />
+      <View style={styles.itemContainer}>
+        <SearchBox style={styles.search} onChangeText={onSearchChange} />
+        <FlatList
+          data={filteredContacts}
+          keyExtractor={({ id }) => `${id}`}
+          renderItem={({ item }: { item: Contact }) => (
+            <BirthdayListItem contact={item} />
+          )}
+          ItemSeparatorComponent={BirthdaySeparator}
+        />
+      </View>
     </View>
   );
 };

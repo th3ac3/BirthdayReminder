@@ -11,16 +11,21 @@ export const canAccessContacts = async (): Promise<boolean> => {
 export const requestContactsAccess = async (): Promise<boolean> => {
   if (Platform.OS === 'ios') return true;
 
-  const permission: PermissionStatus = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
-    title: 'Contacts',
-    message: "We need access to your contacts in order to read your contact's birthdays",
-    buttonPositive: 'Okay',
-  });
+  const permission: PermissionStatus = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+    {
+      title: 'Contacts',
+      message:
+        "We need access to your contacts in order to read your contact's birthdays",
+      buttonPositive: 'Okay',
+    },
+  );
 
   return permission === 'granted';
 };
 
 export type Contact = {
+  id: number;
   name: string;
   thumbnailPath?: string;
   dateOfBirth: Moment;
@@ -38,7 +43,7 @@ export const getContacts = (): Promise<Contact[]> => {
       const contacts = nonTransformedContacts
         .filter((contact) => contact.birthday !== undefined)
         .map(
-          (contact): Contact => {
+          (contact, index): Contact => {
             const dateOfBirth = moment({ ...contact.birthday });
             const nextBirthday = moment(dateOfBirth).year(currentYear);
             if (nextBirthday.isBefore(now)) {
@@ -46,6 +51,7 @@ export const getContacts = (): Promise<Contact[]> => {
             }
 
             return {
+              id: index,
               name: `${contact.givenName} ${contact.familyName}`,
               dateOfBirth,
               nextBirthday,

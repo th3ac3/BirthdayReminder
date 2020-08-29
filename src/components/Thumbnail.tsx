@@ -7,7 +7,12 @@ export interface ThumbnailProps extends ViewProps {
   size?: number;
 }
 
-export const Thumbnail = ({ imagePath, size = 52, style = {}, ...otherProps }: ThumbnailProps): JSX.Element => {
+export const Thumbnail = ({
+  imagePath,
+  size = 52,
+  style = {},
+  ...otherProps
+}: ThumbnailProps): JSX.Element => {
   const styles = {
     thumbnail: {
       width: size,
@@ -24,7 +29,11 @@ export const Thumbnail = ({ imagePath, size = 52, style = {}, ...otherProps }: T
   };
 
   return imagePath ? (
-    <Image source={{ uri: imagePath }} style={[style as ImageStyle, styles.thumbnail]} {...otherProps} />
+    <Image
+      source={{ uri: imagePath }}
+      style={[style as ImageStyle, styles.thumbnail]}
+      {...otherProps}
+    />
   ) : (
     <View style={[style, styles.noImageThumbnail]} {...otherProps} />
   );

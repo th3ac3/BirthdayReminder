@@ -50,7 +50,9 @@ export const CountDown = ({
 }: CountDownProps): JSX.Element => {
   const { t } = useTranslation('CountDown');
   const [countDownNumber, setCountDownNumber] = useState(0);
-  const [countDownUnit, setCountDownUnit] = useState<CountDownUnits>(unitOverride ?? 'days');
+  const [countDownUnit, setCountDownUnit] = useState<CountDownUnits>(
+    unitOverride ?? 'days',
+  );
 
   useEffect(() => {
     const daysDiff = endDate.diff(startDate, 'days');
@@ -75,7 +77,9 @@ export const CountDown = ({
       <View style={styles.countDownNumberBG}>
         <Text style={styles.countDownNumber}>{countDownNumber}</Text>
       </View>
-      <Text style={styles.countDownUnits}>{t('timePeriod', { context: countDownUnit })}</Text>
+      <Text style={styles.countDownUnits}>
+        {t('timePeriod', { context: countDownUnit })}
+      </Text>
     </View>
   );
 };

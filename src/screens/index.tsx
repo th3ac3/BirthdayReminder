@@ -10,7 +10,11 @@ const Stack = createStackNavigator();
 const StackNavigator = (): JSX.Element => {
   return (
     <Stack.Navigator initialRouteName={Routes.BirthdayList}>
-      <Stack.Screen name={Routes.BirthdayList} component={BirthdayList} options={{ headerShown: false }} />
+      <Stack.Screen
+        name={Routes.BirthdayList}
+        component={BirthdayList}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

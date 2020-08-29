@@ -56,7 +56,10 @@ export const BirthdayListItem = ({ contact }: BirthdayProps): JSX.Element => {
             {name}
           </Text>
           <Text style={styles.description}>
-            {t('entry.description', { futureAge: age + 1, birthday: dateOfBirth })}
+            {t('entry.description', {
+              futureAge: age + 1,
+              birthday: dateOfBirth,
+            })}
           </Text>
         </View>
       </View>
